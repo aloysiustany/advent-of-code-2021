@@ -40,17 +40,12 @@ class Position:
 
 if __name__ == '__main__':
     input_lines = file_reader.read_string_file(input_file_path)
+    
     pos = Position()
-    for line in input_lines:
-        instruction = Instruction(line)
-        pos.move(instruction)
-
+    [pos.move(Instruction(line)) for line in input_lines]
     print("Silver:", str(pos.horizontal * pos.depth), "[", pos, "]")
 
     pos = Position()
-    for line in input_lines:
-        instruction = Instruction(line)
-        pos.move_improved(instruction)
-
+    [pos.move_improved(Instruction(line)) for line in input_lines]
     print("Gold:", str(pos.horizontal * pos.depth), "[", pos, "]")
     
