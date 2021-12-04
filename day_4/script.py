@@ -71,17 +71,15 @@ if __name__ == '__main__':
                 boards.append(board)
                 board = BingoBoard()
             continue
-        board.add_row([int(x) for x in input.split()])
+        board.add_row([int(number) for number in input.split()])
 
-    game_complete = False 
     winners = []
     for drawn_number in draw:
-        if (game_complete == False):
-            for i, board in enumerate(boards):
-                if any(winning_board['Board'] == i for winning_board in winners): continue
-                result = board.play(drawn_number)
-                if (result == True):
-                    winners.append({'Board':i, 'WinningScore':boards[i].calc_score(drawn_number), 'WinningNumber':drawn_number})
+        for board_idx, board in enumerate(boards):
+            if any(winning_board['Board'] == board_idx for winning_board in winners): continue
+            result = board.play(drawn_number)
+            if (result == True):
+                winners.append({'Board':board_idx, 'WinningScore':boards[board_idx].calc_score(drawn_number), 'WinningNumber':drawn_number})
 
     print("Silver    --->   Score:", winners[0]['WinningScore'], "\t[Board", winners[0]['Board'], "won first]", "\tWinning Number:", winners[0]['WinningNumber'])
     print("Gold      --->   Score:", winners[-1]['WinningScore'], "\t[Board", winners[-1]['Board'], "won last]", "\tWinning Number:", winners[-1]['WinningNumber'])
