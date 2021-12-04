@@ -74,19 +74,14 @@ if __name__ == '__main__':
         board.add_row([int(x) for x in input.split()])
 
     game_complete = False 
-    winning_board = -1
-    winning_number = -1
+    winners = []
     for drawn_number in draw:
         if (game_complete == False):
             for i, board in enumerate(boards):
+                if any(winning_board['Board'] == i for winning_board in winners): continue
                 result = board.play(drawn_number)
                 if (result == True):
-                    print()
-                    winning_board = i
-                    winning_number = drawn_number
-                    game_complete = True
-                    break
-    
-    print(boards[winning_board])
+                    winners.append({'Board':i, 'WinningScore':boards[i].calc_score(drawn_number), 'WinningNumber':drawn_number})
 
-    print("Silver    --->   Score:", boards[winning_board].calc_score(winning_number), "  [Board", i, "won]", "   Winning Number:", winning_number)
+    print("Silver    --->   Score:", winners[0]['WinningScore'], "\t[Board", winners[0]['Board'], "won first]", "\tWinning Number:", winners[0]['WinningNumber'])
+    print("Gold      --->   Score:", winners[-1]['WinningScore'], "\t[Board", winners[-1]['Board'], "won last]", "\tWinning Number:", winners[-1]['WinningNumber'])
