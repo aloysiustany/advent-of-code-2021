@@ -39,7 +39,7 @@ class Point:
 
 class Map:
     def __init__(self):
-        self.area = [[0 for col in range(map_max_col)] for row in range(map_max_row)]
+        self.area = [([0] * map_max_col) for _ in ([0] * map_max_row)]    # declare zero initialized matrix as the area of map
         self.overlapping_points_count = 0
 
     def mark_points(self, points):
