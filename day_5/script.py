@@ -1,4 +1,3 @@
-from sympy import *
 import enum
 import utils.file_reader as file_reader
 from timeit import default_timer as timer
@@ -13,23 +12,45 @@ class LinePosition(enum.Enum):
     horizontal = 2
     diagonal = 3
 
+class Point:
+    def __init__(self, x, y):
+        self[0] = x
+        self[1] = y
+    
+    def __getitem__(self, key):
+        if key < 0 or key > 1:
+            raise Exception("Index out of bounds [key {k}] for Point: {p}".format(p = self.__str__(), k = key))
+        return self.x if key == 0 else self.y
+
+    def __setitem__(self, key, value):
+        if key < 0 or key > 1:
+            raise Exception("Index out of bounds for Point: " + self.__str__())
+        if key == 0:
+            if (value > map_max_row):
+                raise Exception("Input outside map range. " + value)
+            self.x = value
+        else:
+            if (value > map_max_col):
+                raise Exception("Input outside map range. " + value)
+            self.y = value
+
+    def __str__(self):
+        return "[{x},{y}]".format(x=self.x, y=self.y)
+
 class Map:
     def __init__(self):
         self.area = [[0 for col in range(map_max_col)] for row in range(map_max_row)]
+        self.overlapping_points = []
 
     def mark_points(self, points):
         for p in points:
             self.area[p[0]][p[1]] += 1
+            if (self.area[p[0]][p[1]] == 2): self.overlapping_points.append(str(p))
     
     def count_overlapping_points(self):
-        count = 0
-        for i in range(map_max_row):
-            for j in range(map_max_col):
-                if self.area[i][j] > 1:
-                    count += 1
-        return count
+        return len(self.overlapping_points)
 
-class SpecialLine:
+class Line:
     def __init__(self, p1, p2):
         self.p1 = p1
         self.p2 = p2
@@ -39,10 +60,6 @@ class SpecialLine:
             self.position = LinePosition.vertical
         else:
             self.position = LinePosition.diagonal   # assumed as per problem statement
-
-    @staticmethod
-    def is_vertical_or_horizontal(p1, p2):
-        return p1[0] == p2[0] or p1[1] == p2[1]
     
     def get_all_points(self, consider_diagonal_line):
         if self.position == LinePosition.horizontal:
@@ -64,33 +81,24 @@ class SpecialLine:
     def __str__(self):
         return "[{p00},{p01}] -> [{p10},{p11}]".format(p00 = self.p1[0], p01 = self.p1[1], p10 = self.p2[0], p11 = self.p2[1])
 
+
 if __name__ == '__main__':
     start = timer()
 
     input_lines = file_reader.read_string_file(input_file_path)
 
-    lines = []
-    for input in input_lines:
-        points_parts = [int(prt) for pt in input.split(" -> ") for prt in pt.split(",")]
-        p1 = Point(points_parts[0], points_parts[1])
-        p2 = Point(points_parts[2], points_parts[3])
-        if points_parts[0] > map_max_row or points_parts[2] > map_max_row or points_parts[1] > map_max_col or points_parts[3] > map_max_col:
-            raise Exception("Input output map range. " + input)
-        line = SpecialLine(p1, p2)
-        lines.append(line)
+    lines = [Line(pts[0], pts[1]) for pts in [ 
+        [tuple(map(int, item.split(',')))
+        for item in line.split('->')]
+        for line in input_lines
+    ]]
 
     map = Map()
-    for line in lines:
-        all_points_on_line = line.get_all_points(False)
-        map.mark_points(all_points_on_line)
-    
+    for line in lines: map.mark_points(line.get_all_points(False))
     print("Silver   -->   Number of points that overlap:",map.count_overlapping_points())
 
     map = Map()
-    for line in lines:
-        all_points_on_line = line.get_all_points(True)
-        map.mark_points(all_points_on_line)
-    
+    for line in lines: map.mark_points(line.get_all_points(True))
     print("Gold     -->   Number of points that overlap:",map.count_overlapping_points())
 
     print("--- %s seconds ---" % str(timer() - start))
