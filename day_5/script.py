@@ -40,15 +40,15 @@ class Point:
 class Map:
     def __init__(self):
         self.area = [[0 for col in range(map_max_col)] for row in range(map_max_row)]
-        self.overlapping_points = []
+        self.overlapping_points_count = 0
 
     def mark_points(self, points):
         for p in points:
             self.area[p[0]][p[1]] += 1
-            if (self.area[p[0]][p[1]] == 2): self.overlapping_points.append(str(p))
+            if (self.area[p[0]][p[1]] == 2): self.overlapping_points_count += 1
     
     def count_overlapping_points(self):
-        return len(self.overlapping_points)
+        return self.overlapping_points_count
 
 class Line:
     def __init__(self, p1, p2):
@@ -61,14 +61,14 @@ class Line:
         else:
             self.position = LinePosition.diagonal   # assumed as per problem statement
     
-    def get_all_points(self, consider_diagonal_line):
+    def get_all_points(self):
         if self.position == LinePosition.horizontal:
             inc_factor = -1 if self.p1[1] > self.p2[1] else 1
             return [Point(self.p1[0], p) for p in range(self.p1[1], self.p2[1] + inc_factor, inc_factor)]
         if self.position == LinePosition.vertical:
             inc_factor = -1 if self.p1[0] > self.p2[0] else 1
             return [Point(p, self.p1[1]) for p in range(self.p1[0], self.p2[0] + inc_factor, inc_factor)]
-        if consider_diagonal_line == True and self.position == LinePosition.diagonal:
+        if self.position == LinePosition.diagonal:
             inc_factor = -1 if self.p1[0] > self.p2[0] else 1
             x_range = [x for x in range(self.p1[0], self.p2[0] + inc_factor, inc_factor)]
             inc_factor = -1 if self.p1[1] > self.p2[1] else 1
@@ -76,7 +76,7 @@ class Line:
             if (len(x_range) != len(y_range)):
                 raise Exception("Diagonal line not at 45 degrees")
             return [Point(x_range[i], y_range[i]) for i in range(len(x_range))]
-        return []   # for silver
+        return []   # should not come here
     
     def __str__(self):
         return "[{p00},{p01}] -> [{p10},{p11}]".format(p00 = self.p1[0], p01 = self.p1[1], p10 = self.p2[0], p11 = self.p2[1])
@@ -94,11 +94,13 @@ if __name__ == '__main__':
     ]]
 
     map = Map()
-    for line in lines: map.mark_points(line.get_all_points(False))
-    print("Silver   -->   Number of points that overlap:",map.count_overlapping_points())
 
-    map = Map()
-    for line in lines: map.mark_points(line.get_all_points(True))
-    print("Gold     -->   Number of points that overlap:",map.count_overlapping_points())
+    for line in list(filter(lambda l: l.position != LinePosition.diagonal, lines)):
+        map.mark_points(line.get_all_points())
+    print("Silver   -->   Number of points that overlap:", map.count_overlapping_points())
+
+    for line in list(filter(lambda l: l.position == LinePosition.diagonal, lines)):
+        map.mark_points(line.get_all_points())
+    print("Gold     -->   Number of points that overlap:", map.count_overlapping_points())
 
     print("--- %s seconds ---" % str(timer() - start))
