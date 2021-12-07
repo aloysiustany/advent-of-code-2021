@@ -14,17 +14,13 @@ if __name__ == '__main__':
     median = statistics.median(crab_position)
 
     silver_least_fuel = 0
-    for crab in crab_position:
-        silver_least_fuel += abs(crab - median)
+    [silver_least_fuel := silver_least_fuel + abs(crab - median) for crab in crab_position][-1]
 
     gold_least_fuel = sys.maxsize
     for i in range (min(crab_position), max(crab_position)):
         dist = 0
-        for crab in crab_position:
-            dist += ( ( abs(crab - i) * (abs(crab - i) + 1) ) / 2 )
-        if gold_least_fuel > dist:
-            gold_least_fuel = dist
-        
+        [dist := dist + ( ( abs(crab - i) * (abs(crab - i) + 1) ) / 2 ) for crab in crab_position][-1]
+        gold_least_fuel = dist if gold_least_fuel > dist else gold_least_fuel
     
     print ("Silver   -->    Least fuel:", int(silver_least_fuel))
     print ("Gold     -->    Least fuel:", int(gold_least_fuel))
