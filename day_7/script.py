@@ -1,6 +1,7 @@
 import utils.file_reader as file_reader
 from timeit import default_timer as timer
 import statistics
+import sys
 
 input_file_path = "input/input.txt"
 
@@ -13,14 +14,20 @@ if __name__ == '__main__':
     median = statistics.median(crab_position)
 
     silver_least_fuel = 0
-    # gold_least_fuel = 0
     for crab in crab_position:
         silver_least_fuel += abs(crab - median)
-        # gold_least_fuel += ( ( abs(crab - median) * (abs(crab - median) + 1) ) / 2 )
+
+    gold_least_fuel = sys.maxsize
+    for i in range (min(crab_position), max(crab_position)):
+        dist = 0
+        for crab in crab_position:
+            dist += ( ( abs(crab - i) * (abs(crab - i) + 1) ) / 2 )
+        if gold_least_fuel > dist:
+            gold_least_fuel = dist
         
     
     print ("Silver   -->    Least fuel:", int(silver_least_fuel))
-    # print ("Gold   -->    Least fuel:", int(gold_least_fuel))
+    print ("Gold     -->    Least fuel:", int(gold_least_fuel))
 
     print("--- %s seconds ---" % str(timer() - start))
     
