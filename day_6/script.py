@@ -3,30 +3,29 @@ from timeit import default_timer as timer
 
 input_file_path = "input/input.txt"
 
-def simulate_day(state):
-    for i in range(len(state)):
-        if state[i] == 0:
-            state[i] = 6
-            state.append(8)
-        else: state[i] -= 1
-
-    return state
+def simulate_day(ages):
+    new_fishes = ages[0]
+    for i in range(9):
+        if i > 0: ages[i - 1] = ages[i]
+    ages[8] = new_fishes
+    ages[6] += new_fishes
+    return ages
 
 if __name__ == '__main__':
     start = timer()
 
     input_lines = file_reader.read_string_file(input_file_path)
 
-    state = [int(s) for s in input_lines[0].split(',')]
-
-    for day in range(80):
-        state = simulate_day(state)
+    init_state = [int(s) for s in input_lines[0].split(',')]
     
-    print ("Silver   -->    Number of lanternfish after 80 days:", len(state))
+    ages = [0] * 9
+    for s in init_state:
+        ages[s] += 1
 
-    # for day in range(256 - 80):
-    #     state = simulate_day(state)
-    
-    # print ("Silver   -->    Number of lantern80fish after  days:", len(state))
+    for day in range(80): ages = simulate_day(ages)
+    print ("Silver   -->    Number of lanternfish after 80 days:", sum(ages))
+
+    for day in range(256 - 80): ages = simulate_day(ages)
+    print ("Gold     -->    Number of lanternfish after 256 days:", sum(ages))
 
     print("--- %s seconds ---" % str(timer() - start))
