@@ -4,8 +4,6 @@ from functools import reduce
 
 input_file_path = "input/input.txt"
 
-map = []
-
 class MapPoint:
     def __init__(self, digit):
         self.digit = digit
@@ -16,34 +14,33 @@ def grab_area(i, j):
         return 0
     map[i][j].covered = True
     area = 1
-    if (j != 0): area += grab_area(i, j - 1) # go left
-    if (j != len(map[i]) - 1): area += grab_area(i, j + 1) # go right
-    if (i != 0): area += grab_area(i - 1, j)  # go up
-    if (i != len(map) - 1): area += grab_area(i + 1, j) # go down
+    if (j != 0):
+        area += grab_area(i, j - 1)  # go left
+    if (j != len(map[i]) - 1):
+        area += grab_area(i, j + 1)  # go right
+    if (i != 0):
+        area += grab_area(i - 1, j)  # go up
+    if (i != len(map) - 1):
+        area += grab_area(i + 1, j)  # go down
     return area
 
 if __name__ == '__main__':
     start = timer()
 
     input_lines = file_reader.read_string_file(input_file_path)
-
-    for line in input_lines:
-        map_row = []
-        for digit in line:
-            d = digit.strip()
-            if d != "": map_row.append(MapPoint(int(d)))
-        map.append(map_row)
+    map = [[MapPoint(int(digit)) for digit in line.strip()]
+           for line in input_lines]
 
     risk = 0
     for i in range(len(map)):
         for j in range(len(map[i])):
             if ((j == 0 or map[i][j - 1].digit > map[i][j].digit) and
-                 (j == (len(map[i]) - 1) or map[i][j + 1].digit > map[i][j].digit) and
-                 (i == 0 or map[i - 1][j].digit > map[i][j].digit) and 
-                 (i == (len(map) - 1) or map[i + 1][j].digit > map[i][j].digit)):
-                      risk += (map[i][j].digit + 1)
+                (j == (len(map[i]) - 1) or map[i][j + 1].digit > map[i][j].digit) and
+                (i == 0 or map[i - 1][j].digit > map[i][j].digit) and
+                (i == (len(map) - 1) or map[i + 1][j].digit > map[i][j].digit)):
+                risk += (map[i][j].digit + 1)
 
-    print ("Silver   -->    Risk:", risk)
+    print("Silver   -->    Risk:", risk)
 
     basin = []
     for i in range(len(map)):
@@ -52,7 +49,6 @@ if __name__ == '__main__':
                 area_size = grab_area(i, j)
                 basin.append(area_size)
 
-    print ("Gold     -->    Answer:", reduce(lambda x, y: x*y, sorted(basin, reverse=True)[:3]))
+    print("Gold     -->    Answer:", reduce(lambda x, y: x * y, sorted(basin)[-3:]))
 
     print("--- %s seconds ---" % str(timer() - start))
-    
