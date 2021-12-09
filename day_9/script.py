@@ -32,6 +32,7 @@ if __name__ == '__main__':
            for line in input_lines]
 
     risk = 0
+    low_points = []
     for i in range(len(map)):
         for j in range(len(map[i])):
             if ((j == 0 or map[i][j - 1].digit > map[i][j].digit) and
@@ -39,15 +40,14 @@ if __name__ == '__main__':
                 (i == 0 or map[i - 1][j].digit > map[i][j].digit) and
                 (i == (len(map) - 1) or map[i + 1][j].digit > map[i][j].digit)):
                 risk += (map[i][j].digit + 1)
+                low_points.append([i, j])
 
     print("Silver   -->    Risk:", risk)
 
     basin = []
-    for i in range(len(map)):
-        for j in range(len(map[i])):
-            if map[i][j].digit != 9 and map[i][j].covered == False:
-                area_size = grab_area(i, j)
-                basin.append(area_size)
+    for lp in low_points:
+        area_size = grab_area(lp[0], lp[1])
+        basin.append(area_size)
 
     print("Gold     -->    Answer:", reduce(lambda x, y: x * y, sorted(basin)[-3:]))
 
