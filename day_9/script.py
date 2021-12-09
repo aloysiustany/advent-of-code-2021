@@ -45,9 +45,7 @@ if __name__ == '__main__':
     print("Silver   -->    Risk:", risk)
 
     basin = []
-    for lp in low_points:
-        area_size = grab_area(lp[0], lp[1])
-        basin.append(area_size)
+    for lp in low_points: basin.append(grab_area(lp[0], lp[1]))
 
     print("Gold     -->    Answer:", reduce(lambda x, y: x * y, sorted(basin)[-3:]))
 
