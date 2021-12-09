@@ -1,37 +1,58 @@
 import utils.file_reader as file_reader
 from timeit import default_timer as timer
+from functools import reduce
 
 input_file_path = "input/input.txt"
 
-row_count = 100
-col_count = 100
+map = []
+
+class MapPoint:
+    def __init__(self, digit):
+        self.digit = digit
+        self.covered = False
+
+def grab_area(i, j):
+    if map[i][j].digit == 9 or map[i][j].covered == True:
+        return 0
+    map[i][j].covered = True
+    area = 1
+    if (j != 0): area += grab_area(i, j - 1) # go left
+    if (j != len(map[i]) - 1): area += grab_area(i, j + 1) # go right
+    if (i != 0): area += grab_area(i - 1, j)  # go up
+    if (i != len(map) - 1): area += grab_area(i + 1, j) # go down
+    return area
 
 if __name__ == '__main__':
     start = timer()
 
     input_lines = file_reader.read_string_file(input_file_path)
 
-    map = []
     for line in input_lines:
         map_row = []
         for digit in line:
             d = digit.strip()
-            if d != "":
-                map_row.append(int(d))
+            if d != "": map_row.append(MapPoint(int(d)))
         map.append(map_row)
 
     risk = 0
     for i in range(len(map)):
         for j in range(len(map[i])):
-            if ((j == 0 or map[i][j - 1] > map[i][j]) and
-                 (j == (len(map[i]) - 1) or map[i][j + 1] > map[i][j]) and
-                 (i == 0 or map[i - 1][j] > map[i][j]) and 
-                 (i == (len(map) - 1) or map[i + 1][j] > map[i][j])):
-                      risk += (map[i][j] + 1)
-
+            if ((j == 0 or map[i][j - 1].digit > map[i][j].digit) and
+                 (j == (len(map[i]) - 1) or map[i][j + 1].digit > map[i][j].digit) and
+                 (i == 0 or map[i - 1][j].digit > map[i][j].digit) and 
+                 (i == (len(map) - 1) or map[i + 1][j].digit > map[i][j].digit)):
+                      risk += (map[i][j].digit + 1)
 
     print ("Silver   -->    Risk:", risk)
 
+    basin = []
+    for i in range(len(map)):
+        for j in range(len(map[i])):
+            if map[i][j].digit != 9 and map[i][j].covered == False:
+                area_size = grab_area(i, j)
+                basin.append(area_size)
+
+    print ("Gold     -->    Answer:", reduce(lambda x, y: x*y, sorted(basin, reverse=True)[:3]))
 
     print("--- %s seconds ---" % str(timer() - start))
     
