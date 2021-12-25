@@ -19,3 +19,13 @@ def read_integer_matrix_file(file_path):
                 matrix_row.append(int(digit))
             matrix.append(matrix_row)
     return matrix
+
+def read_matrix_file(file_path):
+    matrix = []
+    with open(file_path, "r") as f_input:
+        for line in f_input.readlines():
+            matrix_row = []
+            for ch in line.strip():
+                matrix_row.append(ch)
+            matrix.append(matrix_row)
+    return matrix
